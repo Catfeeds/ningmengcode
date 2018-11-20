@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>进教室</title>
+</head>
+
+<body>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/layer/layer.js"></script>
+  <script src="js/md5.js"></script>
+  <script src="js/base64.js"></script>
+  <script>
+    var toteachid = GetRequest().toteachid;
+    // var organid = GetRequest().organid;
+    // var host = 'http://test.menke.com/';
+    var host = '/';
+    enterClass();
+
+    function enterClass() {
+      var token = JSON.parse(window.localStorage.getItem("userinfo")).token;
+      var starttime = Date.parse(new Date());
+      var SignStr = getStr({
+          toteachid: toteachid,
+          // organid: organid
+        },
+        localStorage.getItem("key"),
+        starttime,
+        token
+      )
+      $.ajax({
+        url: host + 'admin/organ/intoClassroom',
+        type: 'post',
+        headers: {
+          "token": token,
+          "starttime": starttime,
+          "sign": SignStr
+        },
+        data: {
+          toteachid: toteachid,
+          // organid: organid
+        },
+        dataType: 'json',
+        success: function (res) {
+          if (res.code == 0) {
+            window.location.href = res.data.url
+          } else {
+            layer.msg(res.info);
+          }
+
+        }
+      })
+    };
+
+    //获取地址栏里（URL）传递的参数
+    function GetRequest() {
+      //url例子：XXX.aspx?ID=" + ID + "&Name=" + Name；
+      var url = location.search; //获取url中"?"符以及其后的字串
+      var theRequest = new Object();
+      if (url.indexOf("?") != -1) //url中存在问号，也就说有参数。
+      {
+        var str = url.substr(1);
+        strs = str.split("&");
+        for (var i = 0; i < strs.length; i++) {
+          theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+        }
+      }
+      return theRequest;
+    }
+
+    function getStr(arr, studentkey, starttime, token) {
+      var tostr = arr ? getStrings(arr, "") : '';
+      return $.md5(hex_sha1($.md5(tostr) + $.md5(studentkey) + starttime) + token);
+    }
+
+    function getStrings(data, str) {
+      for (var x in data) {
+        if (isJson(data[x])) {
+          var i = 0;
+          for (var k in data[x]) {
+            i++;
+            break;
+          }
+          if (i > 0) {
+            str += x;
+            str = getStrings(data[x], str);
+          }
+        } else if (isArray(data[x])) {
+          if (data[x].length != 0) {
+            str += x;
+            str = getStrings(data[x], str);
+          }
+        } else {
+          if (
+            data[x] !== undefined &&
+            data[x] !== null &&
+            data[x] !== "" &&
+            data[x] !== false &&
+            data[x] !== true
+          ) {
+            str += x.toString() + data[x].toString();
+          }
+        }
+      }
+      return str;
+    }
+
+    function isArray(o) {
+      return Object.prototype.toString.call(o) == "[object Array]";
+    }
+
+    function isJson(obj) {
+      return (
+        typeof obj == "object" &&
+        Object.prototype.toString.call(obj).toLowerCase() == "[object object]" &&
+        !obj.length
+      );
+    }
+  </script>
+</body>
+
+</html>

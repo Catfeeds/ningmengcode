@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta charset="utf-8"/>
+	<script type="text/javascript" src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
+	<script type="text/javascript" src="/static/js/jsencrypt.js" ></script>
+</head>
+<body>
+<form>
+	<div id='test' stype="border:1px red">点击这里请求pub</div>
+	<input type="input" name="content" id='content'>
+	<div id='send'>输入内容后点击加密发送</div>
+</form>
+</body>
+<script type="text/javascript">
+
+var public = '';
+$('#test').click(function(){
+	$.post('/index.php/index/Index/getpub',{},function(data){
+		public = data ;
+	});
+});
+
+$('#send').click(function(){
+	str = $('#content').val() ;
+	mcryptstr = wrap_encrypt(str);
+
+	$.post('/index.php/index/Index/testrsa',{'datastr':mcryptstr},function(data){
+		console.log(data);
+	});
+});
+function wrap_encrypt(content){
+	var encryptobj = new JSEncrypt();
+	encryptobj.setPublicKey(public);
+
+	var result = '';
+	var step = 117 ;
+	var strlen = content.length;
+	var count = Math.ceil(strlen/step);
+    for(var i=0;i<count;i++) {
+    	chunk = content.substring(step*i, step*(1+i) ) ;
+        result += encryptobj.encrypt(chunk);
+    }
+    return result ;
+}
+
+</script>
+</html>

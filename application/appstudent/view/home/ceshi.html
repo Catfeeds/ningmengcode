@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<button onclick="gotoPay();"></button>
+<script src="/static/js/jquery.js"></script>
+<script>
+    function gotoPay() {
+       // 新加
+// 用表单来初始化
+        $.ajax({
+            url: 'http://ningmeng.talk-cloud.cn/appstudent/Home/getOpenid',
+            beforeSend : function(request) {
+                request.setRequestHeader("uri", window.location.href);
+            },
+            type: 'get',
+            data: {},                    // 上传formdata封装的数据
+            dataType: 'JSON',
+            cache: false,                      // 不缓存
+            processData: false,                // jQuery不要去处理发送的数据
+            contentType: false,                // jQuery不要去设置Content-Type请求头
+            success: function (data) {
+                if (data.code == 0) {
+                    // 新加
+                    alert(data.data);
+                   alert('成功');
+                } else {
+                    alert('失败');
+                }
+            }
+        });
+
+    }
+
+</script>
+</body>
+</html>

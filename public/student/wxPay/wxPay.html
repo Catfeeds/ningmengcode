@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!-- 
+    参数： ordernum   订单编号
+          price      应付金额
+          type       订单类型标识
+   -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title data-locale="WXpay">微信支付</title>
+</head>
+<body>
+    <div class="wrapper" style="width: 1075px;margin: 0 auto">
+        <div class="wxhead">
+            <div class="container">
+                <div class="flex-box">
+                    <img src="./assets/images/wxpay.png" alt="">
+                    <div class="segmentation"></div>
+                    <h2 data-locale="myCashier">我的收银台</h2>
+                </div>
+            </div>
+        </div>
+      </div>
+        <div class="wxinfo">
+            <div class="container" style="width: 1075px;margin: 0 auto;">
+                <ul>
+                    <li class="serialnumber">
+                        <span data-locale="orderNum">订单编号：</span>
+                        <!-- 订单编号： -->
+                        <span id="orderNum"></span>
+                    </li>
+                    <li class="serialtype">
+                        <span data-locale="orderType">订单类型：</span>
+                        <!-- 订单类型： -->
+                        <span id="orderType"></span>
+                    </li>
+                </ul>
+                <div class="paymoney">
+                    <span data-locale="price">应付金额：</span>
+                    <!-- 应付金额： -->
+                    <span>￥<span id="totalPrice"></span></span>
+                </div>
+                <div class="closedTitle"></div>
+            </div>
+        </div>
+        <div class="wrapper" style="width: 1075px;margin: 0 auto">
+        
+        <div class="paytitle">
+            <div class="container">
+                <div class="paycontent">
+                    <ul class="totalinfo">
+                        <li class="wxpay" data-locale="WXpay">微信支付</li>
+                        <li class="remPic"><img src="./assets/images/recommend.png" /></li>
+                        <li class="info" data-locale="payDesc">亿万用户的选择，更快更安全</li>
+                    </ul>
+    
+                    <ul class="payimg">
+                        <li class="qrcode"><img src="" alt="" id="codeImg"></li>
+                        <li class="scanning"><img src="./assets/images/pay.png" alt=""></li>
+                    </ul>
+    
+                </div>
+            </div>
+        </div>
+      </div>
+    
+</body>
+<script type="text/javascript" src="./jquery.min.js"></script>
+<script type="text/javascript" src="./md5.js"></script>
+<script type="text/javascript" src="./base64.js"></script>
+<!-- 加载语言包文件 -->
+<script type="text/javascript" src="./jquery.i18n.properties-min-1.0.9.js"></script>
+<!-- <script type="text/javascript" src="./language.js"></script> -->
+<script>
+  loadProperties();  
+  function loadProperties() {  
+      $.i18n.properties({  
+      name:'strings',    //属性文件名     命名格式： 文件名_国家代号.properties
+      path:'./i18n/',   //注意这里路径是你属性文件的所在文件夹
+      mode:'map',  
+      language:"zh",     //这就是国家代号 name+language刚好组成属性文件名：strings+zh -> strings_zh.properties
+      callback:function(){  
+          $("[data-locale]").each(function(){  
+          console.log($(this).data("locale"));
+              $(this).html($.i18n.prop($(this).data("locale"))); 
+          });  
+      }  
+      });  
+  }
+  function GetQueryString(name){
+     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+     var r = window.location.search.substr(1).match(reg);
+     if(r!=null)return  unescape(r[2]); return null;
+  }
+  var ordernum = GetQueryString("ordernum");
+  var price = GetQueryString("price");
+  var codeurl = window.localStorage.getItem('codeurl');
+  var type = GetQueryString("type");
+  document.getElementById('orderNum').innerHTML = ordernum;
+  document.getElementById('totalPrice').innerHTML = price;
+  document.getElementById('codeImg').src = codeurl;
+  switch(type){
+    case '1':
+      document.getElementById('orderType').innerHTML = '学生充值';
+      break;
+  }
+  function getStr(arr, studentkey, starttime, token) {
+    var tostr = arr?getStrings(arr, ""):'';
+    return $.md5(hex_sha1($.md5(tostr) + $.md5(studentkey) + starttime) + token);
+  }
+  function getStrings(data, str) {
+    for (var x in data) {
+      if (isJson(data[x])) {
+        var i=0;
+        for (var k in data[x]) {
+          i++;
+          break;
+        }
+        if(i>0){
+          str += x;
+          str = getStrings(data[x], str);
+        }
+      }else if(isArray(data[x])){
+        if(data[x].length!=0){
+          str += x;
+          str = getStrings(data[x], str);
+        }
+      } else {
+        if(data[x]!==undefined && data[x]!==null && data[x]!==''&& data[x]!==false && data[x] !==true){
+          str += x.toString() + data[x].toString();
+        }
+      }
+    }
+    return str;
+  }
+  function isArray(o) {
+    return Object.prototype.toString.call(o) == "[object Array]";
+  }
+  function isJson(obj) {
+    return (
+      typeof obj == "object" &&
+      Object.prototype.toString.call(obj).toLowerCase() == "[object object]" &&
+      !obj.length
+    );
+  }
+  function checkStatus () {
+    var token = JSON.parse(window.localStorage.getItem("studentinfo")).token;
+    var starttime = Date.parse(new Date());
+    var SignStr = getStr(
+        {ordernum:ordernum},
+        localStorage.getItem("studentkey"),
+        starttime,
+        token
+    )
+    $.ajax({
+      headers:{
+        "token":token,
+        "starttime":starttime,
+        "sign":SignStr
+      },
+      contentType:'application/json',
+      url:'/student/Myorder/orderQuery',
+      type:'POST', 
+      async:true, 
+      data:JSON.stringify({
+        ordernum:ordernum
+      }),
+      dataType:'json',
+      success:function(data){
+        //   console.log(3,data)
+        if ( data.code===0 ) { 
+          if(data.data.trade_state == 'SUCCESS'){
+            clearInterval(window.a);
+            console.log('cg')
+            window.location.href = 'success.html?type=2'
+            return false;
+          }else if (data.data.trade_state == 'PAYERROR'){
+            clearInterval(window.a);
+            window.location.href = 'success.html?type=3'
+            return false;
+          }else if(data.data.trade_state == 'CLOSED'||data.data.trade_state == 'REVOKED'){
+            document.getElementsByClassName('closedTitle').innerHTML = '当前订单已失效，请重新下单';
+          }
+        } else { 
+          
+        } 
+      },
+      error:function(xhr,textStatus){
+      },
+      complete:function(){   
+      }
+    })
+  }
+  window.a = setInterval(function(){ 
+    checkStatus();
+  },3000)
+</script>
+<style>
+ul{
+    margin: 0;
+}
+li{
+    list-style: none;
+}
+.wxhead{
+    width: 100%;
+    background: #fff;
+    height: 62px;
+    position: relative;
+    margin-bottom: 20px;
+}
+.wxhead h2{
+    font-size:16px;
+    color:rgba(103,109,112,1);
+    margin-top: 20px;
+    position: absolute;
+    top: 10px;
+    left: 200px;
+}
+.wxhead img{
+    margin: 9px 0;
+}
+.wxhead .segmentation{
+    width:1px;
+    height:20px;
+    background:#676D70;
+    margin: 20px 10px;
+    position: absolute;
+    top: 11px;
+    left: 180px;
+}
+.wxinfo{
+    width:100%;
+    padding-bottom: 30px;
+    background: #eee;
+    overflow: hidden;
+}
+.wxinfo ul{
+    float: left;
+    
+}
+.wxinfo li{
+    font-size: 14px;
+    color: rgba(103,109,112,1);
+}
+.wxinfo li.serialnumber{
+    margin-top: 40px;
+}
+.wxinfo li.serialtype{
+    margin-top: 20px;
+}
+.wxinfo .paymoney{
+    float: right;
+    color: #676D70;
+    font-size: 14px;
+    margin-top: 51px;
+    margin-right: 70px;
+    
+}
+.paymoney span{
+    color: #ff8208;
+    font-size: 16px;
+}
+.paytitle{
+    width: 1075px;
+    min-width: 1075#676d70;
+    height: 480px;
+    margin-top: 30px;
+    position: relative;
+}
+
+.paytitle .paycontent{
+    width: 100%;
+    height: 40px;
+    line-height: 42px;
+}
+.paycontent ul.flex-box{
+    border: 1px solid #999999;
+    border-bottom: none;
+}
+.flex-box li.wxpay{
+    font-size: 14px;
+    font-family:PingFangSC-Medium;
+    color:rgba(51,51,51,1);
+    margin: 0 6px 0 26px;
+}
+.totalinfo{
+    position: relative;
+    border: 1px solid #999999;
+    border-bottom: none;
+}
+
+.remPic{
+    position: absolute;
+    top: 5px;
+    left: 117px;
+}
+.remPic img{
+    width: 46px;
+    height: 20px;
+}
+.flex-box img{
+    width: 158px;
+    margin-top: 19px;
+}
+    li.info{
+    font-size: 12px;
+    color: rgba(153,153,153,1);
+    position: absolute;
+    top: 0;
+    left: 180px;
+}
+.paycontent ul.payimg{
+    border: 1px solid #999999;
+    
+}
+.payimg img{
+    display: block;
+}
+
+.qrcode img{
+        width: 160px;
+        height: 160px;
+        margin: 95px auto 28px auto;
+    }
+.payimg li.scanning{
+    cursor: pointer;
+    
+}
+.scanning img{
+    width: 156px;
+    height: 52px;
+    margin: 0 auto 105px auto;
+}
+.closedTitle{
+  color:red; 
+  padding: 20px 0 0; 
+  clear:both;
+  padding-left: 39px;
+}
+</style>
+</html>

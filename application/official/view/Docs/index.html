@@ -1,0 +1,145 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>拓课云接口</title>
+        <link rel="stylesheet" type="text/css" href="/static/zui/css/zui.css" media="all" />
+        <script src="/static/js/jquery.js"></script>
+        <script src="/static/zui/js/zui.js"></script>
+    </head>
+    
+    <body>
+        <style>
+            body{ padding:40px;font-family:'Microsoft YaHei', '微软雅黑'; font-size:14px; color:#000} 
+            input{font-family:'Microsoft YaHei', '微软雅黑'; font-size:14px; color:#000} #main 
+            div{ margin:10px 0px} 
+            select{width: 180px}
+            input{ text-align:left} #main div.box{overflow: hidden; }
+            .col-lg-6{width: 650px; padding: 0px;}
+        </style>
+        <div id="main">
+            <div class="box">
+                <div class="col-lg-6">
+                    选择接口：<select id="api" name="api">
+                        <option value="" type="get" returns=""  data="" tip="">选择接口</option>
+                            {volist name="api" id="vo"}
+                                <option value="{:url($vo['url'],'',true,true)}" returns="{$vo.returns}" type="{$vo.type|default=''}" data="{$vo.data|default=''}" tip="{$vo.tip|default=''}" note="{$vo.note|default=''}">{$vo.name}</option>
+                            {/volist}
+                        </select>现在已经有
+                    <strong style="color:#F00;  font-size:30px">{$num}</strong>个接口了%&gt;_&lt;%
+                    <div>接口网址：<input type="text" id="url" style="width:500px" /></div>
+                    <div>提交参数：<textarea id="data" style="width:500px;height: 70px"></textarea></div>
+                    <div>提交类型：<input type="text" id="type" value="get" /></div>
+                    <div>输出html，调试打印数组：
+                        <input type="radio" class="is_arr" name="is_arr" value="json" checked="checked" />json
+                        <input type="radio" name="is_arr" class="is_arr" value="html" />html
+                    </div>
+                    <button type="button" onclick="postdata();" class="btn btn-info" style="margin-bottom:20px">测试提交</button>
+                </div>
+                <div class="col-lg-3">
+                    <span id="note" style="display:none">
+                    <!-- <button type="button" onclick="postdata('noet');" class="btn" style="margin-bottom:20px">查看字段注释</button> -->
+                    </span>
+                    <span style="color:red;">提交参数：</span>
+                    <textarea readonly="" style="width: 100%;height: 270px;" id="tip"></textarea>
+                </div>
+                <div class="col-lg-3">
+                    <span style="color:red;">返回说明：</span>
+                    <textarea  readonly="" style="width: 100%;height: 270px;" id="returns"></textarea>
+                </div>
+            </div>
+
+                
+
+            <textarea id="back" style="background:#f5f5f5; width:100%; height:600px; text-align:left; font-family:'Microsoft YaHei', '微软雅黑'; font-size:14px; color:#000"></textarea>
+        </div>
+        <script type="text/javascript">
+            $('#api').change(function() {
+                $('#url').val($(this).val());
+                $('#data').val($(this).find("option:selected").attr('data'));
+                $('#type').val($(this).find("option:selected").attr('type'));
+                $('#tip').val(JSON.stringify(jsons($(this).find("option:selected").attr('tip')), null, 8));
+                $('#returns').val(JSON.stringify(jsons($(this).find("option:selected").attr('returns')),null,8));
+
+                if ($(this).find("option:selected").attr('note')) {
+                    $('#note').show()
+                } else {
+                    $('#note').hide()
+                }
+
+            });
+
+            function jsons(jsontext){
+                if(jsontext=='') return '';
+                return eval('('+ jsontext +')');
+            }
+
+            function postdata(types) {
+                var type = $('#type').val();
+                var url = $('#url').val();
+                var data = jsons($('#data').val());
+                var is_arr = $('input[name="is_arr"]:checked').val();
+
+                // if (types) {
+                //     url = "index.php{:url('app/app/getNote')}";
+                //     is_arr = 'html';
+                //     data = 'table=' + $('#api').find("option:selected").attr('note');
+                // }
+
+                $.ajax({
+                    async: true,
+                    type: type,
+                    url: url,
+                    data: data,
+                    dataType: is_arr,
+                    beforeSend: function() {
+                        var data = $('#back').val('');
+                        var msg = $.zui.messager.show('请稍等......', {
+                            placement: 'center'
+                        });
+                    },
+
+                    success: function(data) {
+                        if (is_arr == 'html') {
+                            $('#back').val(data);
+                            var msg = $.zui.messager.show('查询完成', {
+                                placement: 'center',
+                                type: 'success'
+                            });
+                        } else {
+
+                            if (data.code == 0) {
+                                $('#back').val(JSON.stringify(data, null, 8));
+                                if (!data.info) {
+                                    data.info = '查询完成';
+                                }
+                                var msg = $.zui.messager.show(data.info, {
+                                    placement: 'center',
+                                    type: 'success'
+                                });
+                            } else {
+                                $('#back').val(JSON.stringify(data, null, 8));
+                                var msg = $.zui.messager.show(data.info, {
+                                    placement: 'center',
+                                    type: 'warning'
+                                });
+                            }
+
+                        }
+
+                    },
+                    error: function() {
+                        var data = $('#back').val('');
+                        var msg = $.zui.messager.show('长点心吧！肯定是数据格式错了，php致命错误，要么就是用错提交类型了！', {
+                            placement: 'center',
+                            type: 'danger'
+                        });
+                    }
+
+                });
+
+            }</script>
+    </body>
+
+</html>

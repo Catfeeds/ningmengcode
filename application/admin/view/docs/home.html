@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>柠檬接口</title>
+        <link rel="stylesheet" type="text/css" href="/static/zui/css/zui.css" media="all" />
+        <link rel="stylesheet" type="text/css" href="/static/css/style.css" media="all" />
+        <script src="/static/js/jquery.js"></script>
+        <script type="text/javascript" src="/static/js/bass64.js" ></script>
+        <script type="text/javascript" src="/static/js/md5.js" ></script>
+        <script src="/static/zui/js/zui.js"></script>
+        <script type="text/javascript" src="/static/js/jsencrypt.js" ></script>
+        
+    </head>
+    <body>
+        <div class="navbar navbar-inverse navbar-fixed-top innavbar" id="navbar" role="banner" style="padding-right: 10px;">
+            <span class="title" >柠檬教育 <i class="icon icon-leaf"></i></span>
+        </div>
+        <div class="incontent">
+            <div class="inleft">
+                {volist name="api" id="vo"}
+                    <li data-toggle="tooltip" data-placement="top" title="{$vo.name}" data-value="{:url($vo['url'],'',true,true)}" data-returns="{$vo.returns}" data-type="{$vo.type|default=''}" data-data="{$vo.data|default=''}" data-tip="{$vo.tip|default=''}" data-note="{$vo.note|default=''}">{$i}.{$vo.name}</li>
+                {/volist}
+            </div>
+            <div class="inright">
+                <div class="contents">
+                    <div class="col-lg-5 zuoce">                        
+                        <!-- <div>现在已经有<strong style="color:#F00;  font-size:20px">{$num}</strong>个接口了%&gt;_&lt;%</div> -->
+                        <div><span class="positionIn intext">接口网址</span><input class="form-control" type="text" id="url" /></div>
+                        <div>
+                            <span class="positionIn ">提交参数</span>
+                            <textarea class="form-control" id="data" style="height: 106px"></textarea>
+                        </div>
+                        <div><span class="positionIn intext">提交类型</span><input class="form-control" type="text" id="type" value="get" /></div>
+                        <div>
+                            <span class="positionIn">现在已经有
+                            <strong style="color:#F00;  font-size:20px">{$num}</strong>个接口了%&gt;_&lt;%
+                            </span>
+                            <input type="radio" class="is_arr" name="is_arr" value="json" checked="checked" />json
+                            <input type="radio" class="is_arr" name="is_arr" value="html" />html
+                        </div>
+                        <div style="margin-top: 15px;" class="text-right">
+                            <button type="button" class="btn btn-info subBtn" >提交参数</button>
+                            <button type="button" onclick="postdata();" class="btn btn-info" >测试提交</button>
+                        </div>
+                        
+                    </div>
+                    <div class="col-lg-3">
+                        <span class="rightIn" >提交参数</span>
+                        <textarea readonly="" style="width: 100%;height: 280px;background: #F9FBFB;" id="tip"></textarea>
+                    </div>
+                    <div class="col-lg-4">
+                        <span class="rightIn" >返回说明</span>
+                        <textarea  readonly="" style="width: 100%;height: 280px;background: #F9FBFB;" id="returns"></textarea>
+                    </div>
+                </div>
+                <textarea id="back" style="background:#F9FBFB;width:100%; height: 63%; text-align:left; font-family:'Microsoft YaHei', '微软雅黑'; font-size:14px; color:#000"></textarea>
+            </div>
+        </div>
+
+
+        <script type="text/javascript">
+            var publickey = '-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAprITkHUqjwbOAVLaBD/Uia7eu4jHzwOqYUz2KxEf7VQaXTnq\ndUCdHPbSLcNUOsHEOlbJ82da4E3VuOec7MOufD8MbNo1pizGOZGdmmBaUal/Aer0\n9p8fuxVIc6yCQz4vGkTxmZ2TMSNwKLt2UKEQtpCcrFKlXhjgFR4wS560ySQuaSR8\n4fBeLYbXgE22mEOOSU4H7Mf6eW8JZf3WZ5m0xsfUfKC9WeUpWYXBM0hd4uZqSV/P\nGztXc/LyPVl6y5Ncvd1Te7ftWMNt3HR5tYhrdGIXnsfn+RDMQkpTOS8bZxkTAhKk\ngSo/KxgikjpRl5QKZvh7UbkvI9gFha3gyA0QYQIDAQABAoIBAEKp2psd0DxMq1vq\nJ1glsrixH0/+PnHydFPfNF86xPrjdHut6q6jfXGU367/e5LX5MKz7KWTwssLNZpx\nvdcN1pzHlg9+IJBpPYjOTCntuJEJ6Mn6jaaHMmhd9ZCU/68mki2+PqSBWNkA5BzW\nA1XxY76vDIj5sDp2Vj77yLKlMIVzdnDsGOKU2oxcdn2C54BNOBw3tvk+oVpMO2KU\nnd9j/v/Qmet9KOWS6fNU6EuYzcSFC/yNWAqWOKH9fMIo5avpAsI57qmscQR62ZeU\nYZg7pGCE/gBYtUb+k+/354TPmwBMsXjw+VlQpy+5Is+nLZKU22r0YUTRJ1Qb5pLi\ndAIkMLECgYEA1SmWfrNgszsXT8pIaSphQJz2GRqma8tysalqq9WrtnGoJqtjFwcB\n8q4TxKs78xNOmBIEptxjTwjMKBAUJvdnUSUVnItSF82xTa4igNbxsCZ03UGEixBV\nCrM0rUw21LfOA1hSK2QfONP3iLFmlAeof5o6EtWko4VOnIwhUjzB7QUCgYEAyDHx\nbehBnQGpzifM0OtNnc16HiU6bf9xLTDMynnYDTNhZfI5sKaZGfNRIbs/3pzkHHlG\nTqmLAM64vYB8E6NEwrpYQda1OAB1pb/KNcZD22i3N7bGz0gCJHDu9CrOufacFgF/\n+/y40MBcWDFkBBs90KPlwoBVtrEm0ZGaAgVllK0CgYEAp04C7uL/bO1eOKP9/Xzj\n5ADOL5n5MPX3yXW9Ya1NHt9KKT+vgG1hnAYBQgVcAkcPEtBhkk28LFYtVux3xLW+\nA7Rlp/65qjEpjly0fAc4nxcv9lDsJPHmrYVGPRZqmr7BFWMG60OkNcg4qrMCXgE8\nwRpdplbE6AtDTh+2L4O8ebkCgYEAo2kY8CTQQg+UgsG8DqCzd2a9EpRC0Hzc7g1S\nbMfuUkApdaS18Hrcp/ETvZvx841PKerYN+dunlcfNxgEr6bqvqSK3BsdSzwczBH0\nRdazlwov29tnBtV5YjOI6Wdz3RnuqIvK426TkVojRp3yTOPLnl3actx8mqaZ0CCw\nfIvZMfUCgYAnpD6+Qx+A2AgDPL9ZT4jtng1+L6+qu3NU3iy5WuI4MGI4q7c9wSsb\nQVnWokTlKJIvOY4DQE95aCgLqgEffYd8JNfzfGnXYWOcVQEkf+Exrp19nfb+qq60\ngX0L9BzE2yEpgd6G/WGQweURpmtmuLDppPALfaCi/8uh2Z/xLGMCOQ==\n-----END RSA PRIVATE KEY-----\n';
+
+            $('.inleft li').click(function () {
+                $(this).addClass('active').siblings().removeClass('active');
+                $('#url').val($(this).data('value'));
+                $('#data').val($(this).data('data'));
+                $('#type').val($(this).data('type'));
+                $('#tip').val(JSON.stringify(jsons($(this).data('tip')), null, 8));
+                $('#returns').val(JSON.stringify(jsons($(this).data('returns')),null,8));
+            })
+
+            $('.subBtn').click(function(){
+                var subJson = jsons($('#data').val());
+                $('#back').val(JSON.stringify(subJson, null, 8));
+            });
+
+
+            var arr = {'inlist':0,'aaa':false,'bbb':true,'ccc':{'ddd':undefined,'eee':null,'list':{'mmm':'','VVV':'MMM'},'info':[{'~~~':"~~~"},{'@@@':"@@@"},{'&&&':'&&&'},],}};
+
+
+            function getStr(arr,key,starttime,token) {
+                var tostr = arr?getStrings(arr,''):'';
+                // console.log($.md5(tostr));
+                // console.log(tostr);
+//               console.log(key);
+//               console.log(starttime);
+//               console.log(token);
+                return $.md5(hex_sha1($.md5(tostr)+$.md5(key)+starttime)+token);
+            }
+
+
+
+
+//            function getStrings(data,str){
+//               for (x in data) {
+//                   if(isJson(data[x])||isArray(data[x])){
+//                       str += x;
+//                       str = getStrings(data[x],str);
+//                   }else{
+//                       str += x+data[x];
+//                   }
+//               }
+//               return str;
+//           }
+
+			function getStrings(data, str) {
+				for (var x in data) {
+					if (isJson(data[x])) {
+						var i=0;
+						for (var k in data[x]) {
+							i++;
+							break;
+						}
+						if(i>0){
+							str += x;
+							str = getStrings(data[x], str);
+						}
+					}else if(isArray(data[x])){
+						if(data[x].length!=0){
+							str += x;
+							str = getStrings(data[x], str);
+						}
+					} else {
+						if(data[x]!==undefined && data[x]!==null && data[x]!==''&& data[x]!==false && data[x] !==true){
+							str += x.toString() + data[x].toString();
+						}
+					}
+				}
+				return str;
+			}
+            function isArray(o){
+                return Object.prototype.toString.call(o)=='[object Array]';
+            }
+            function isJson(obj){
+                return typeof(obj) == "object" && Object.prototype.toString.call(obj).toLowerCase() == "[object object]" && !obj.length;
+            }
+
+          
+
+            function jsons(jsontext){
+                if(jsontext=='') return '';
+                return eval('('+ jsontext +')');
+            }
+
+            function wrap_encrypt(content){
+                var encryptobj = new JSEncrypt();
+                encryptobj.setPublicKey(publickey);
+
+                var result = '';
+                var step = 117 ;
+                var strlen = content.length;
+                var count = Math.ceil(strlen/step);
+                for(var i=0;i<count;i++) {
+                    chunk = content.substring(step*i, step*(1+i) ) ;
+                    result += encryptobj.encrypt(chunk);
+                }
+                return result ;
+            }
+
+            function randomString(len, charSet) {
+              charSet = charSet || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+              var randomString = '';
+              for (var i = 0; i < len; i++) {
+               var randomPoz = Math.floor(Math.random() * charSet.length);
+               randomString += charSet.substring(randomPoz,randomPoz+1);
+              }
+              return randomString;
+            }
+
+
+            function postdata(types) {
+                var type = $('#type').val();
+                var url = $('#url').val();
+                var data = jsons($('#data').val());
+                var is_arr = $('input[name="is_arr"]:checked').val();
+
+                if(url.indexOf("/index/Login/login") != -1 || url.indexOf("/student/Homepage/register") != -1){
+                    var key = randomString(10);
+                    localStorage.setItem('key',key);
+                    data['key'] = key;
+                    data = {'data':wrap_encrypt(JSON.stringify(data))};
+                }
+                userInfo = JSON.parse(localStorage.getItem('userInfo'));
+                headers = {};
+                if(userInfo){
+                    headers = {'token':userInfo['token'],'starttime':Date.parse(new Date())};
+                    sign = getStr(data,localStorage.getItem('key'),headers['starttime'],userInfo['token']);
+                    headers['sign'] = sign;
+                }
+
+                $.ajax({
+                    async: true,
+                    type: type,
+                    headers:headers,
+                    url: url,
+					contentType:'application/json',
+                    data: JSON.stringify(data),
+                    dataType: is_arr,
+                    beforeSend: function() {
+                        var data = $('#back').val('');
+                        var msg = $.zui.messager.show('请稍等......', {
+                            placement: 'center'
+                        });
+                    },
+
+                    success: function(data) {
+                        if (is_arr == 'html') {
+                            $('#back').val(data);
+
+                            var msg = $.zui.messager.show('查询完成', {
+                                placement: 'center',
+                                type: 'success'
+                            });
+                        } else {
+
+                            if (data.code == 0) {
+                                $('#back').val(JSON.stringify(data, null, 8));
+
+                                if(url.indexOf("/index/Login/login") != -1 || url.indexOf("/student/Homepage/register") != -1){
+                                    localStorage.setItem('userInfo',JSON.stringify(data.data));
+                                }
+                                if (!data.info) {
+                                    data.info = '查询完成';
+                                }
+                                var msg = $.zui.messager.show(data.info, {
+                                    placement: 'center',
+                                    type: 'success'
+                                });
+                            } else {
+                                $('#back').val(JSON.stringify(data, null, 8));
+                                var msg = $.zui.messager.show(data.info, {
+                                    placement: 'center',
+                                    type: 'warning'
+                                });
+                            }
+
+                        }
+
+                    },
+                    error: function() {
+                        var data = $('#back').val('');
+                        var msg = $.zui.messager.show('长点心吧！肯定是数据格式错了，php致命错误，要么就是用错提交类型了！', {
+                            placement: 'center',
+                            type: 'danger'
+                        });
+                    }
+
+                });
+            }
+        </script>
+    </body>
+
+</html>

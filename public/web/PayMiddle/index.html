@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>pay</title>
+</head>
+
+<body>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/layer/layer.js"></script>
+  <script src="js/md5.js"></script>
+  <script src="js/base64.js"></script>
+  <script>
+    var type = GetRequest().type;
+    var host = '/';
+    // var host = 'http://test.menke.com/'
+
+    var publickey = '';
+    window.localStorage.removeItem('organCode');
+
+    var token = JSON.parse(window.localStorage.getItem("studentinfo")).token;
+
+    var OrderDetailData = {};//订单详情
+
+    getshowOrderDetail();
+
+    //获取订单详情
+    function getshowOrderDetail(){
+      var starttime = Date.parse(new Date());
+      var SignStr = getStr(
+        {
+          ordernum:GetRequest().ordernum,
+        },
+        localStorage.getItem("studentkey"),
+        starttime,
+        token
+      )
+      if(GetRequest().buyClass == 1){
+        var url = host + 'student/Package/showOrderDetail'
+      }else{
+        var url = host + 'student/Myorder/showOrderDetail'
+      }
+      $.ajax({
+        url: url,
+        type:'post',
+        headers:{
+          "token":token,
+          "starttime":starttime,
+          "sign":SignStr
+        },
+        data: JSON.stringify({
+          ordernum: GetRequest().ordernum,
+        }),
+        contentType:'application/json',
+        dataType:'json',
+        success:function(res){
+          if(res.code == 0){
+            OrderDetailData = res.data;
+            geCode()
+          }else{
+            layer.msg(res.info);
+          }
+        }
+      });
+    }
+
+    //生成订单
+    function geCode() {
+      var starttime = Date.parse(new Date());
+      var num = OrderDetailData.usablemoney;
+          num= parseFloat(num);
+//    var num = 0;
+      var SignStr = getStr(
+        {
+          ordernum: OrderDetailData.ordernum,
+          paytype:GetRequest().paytype,
+        },
+        localStorage.getItem("studentkey"),
+        starttime,
+        token
+      );
+      if(GetRequest().buyClass == 1){
+        var url2 = host + 'student/Package/gotoPay'
+      }else{
+        var url2 = host + 'student/Myorder/gotoPay'
+      }
+      $.ajax({
+        url: url2,
+        type:'post',
+        headers:{
+          "token":token,
+          "starttime":starttime,
+          "sign":SignStr
+        },
+        data:JSON.stringify({
+          ordernum: OrderDetailData.ordernum,
+          // studentid: OrderDetailData.studentid,
+          // amount: OrderDetailData.amount,
+          // usablemoney:num,
+          paytype:GetRequest().paytype,
+          // coursename: OrderDetailData.coursename,
+          // classtype: OrderDetailData.type,
+          // gradename: OrderDetailData.classname==null?"":OrderDetailData.classname,
+        }),
+        dataType:'json',
+        contentType:'application/json',
+        success:function(res){
+          if(res.code == 0){
+            // if(type == 'wx'){
+            //   window.localStorage.setItem('organCode',res.data.codeurl);
+            //   window.location.href =  window.location.origin + '/admin/wxPay/wxPay.html?ordernum=' + res.data.out_trade_no + '&price=' + res.data.orderprice + '&type=2'
+            // }else 
+            if(type == 'alipayWeb'){
+              var div = document.createElement('div');
+              div.innerHTML = res.data.data;
+              document.body.appendChild(div);
+              document.forms.alipaysubmit.submit();
+            }
+            if(type == 'paypal'){
+              var paypalFrom = res.data;
+              document.getElementsByName("cmd")[0].value = paypalFrom.cmd;
+              document.getElementsByName("business")[0].value = paypalFrom.business;
+              document.getElementsByName("item_name")[0].value = paypalFrom.item_name;
+              document.getElementsByName("item_number")[0].value = paypalFrom.item_number;
+              document.getElementsByName("amount")[0].value = paypalFrom.amount;
+              document.getElementsByName("currency_code")[0].value = paypalFrom.currency_code;
+              document.getElementsByName("return")[0].value = paypalFrom.return;
+              document.getElementsByName("notify_url")[0].value = paypalFrom.notify_url;
+              document.getElementsByName("cancel_return")[0].value = paypalFrom.cancel_return;
+              document.getElementsByName("invoice")[0].value = paypalFrom.invoice;
+              document.form_starPay.submit();
+            }
+          }else{
+            layer.msg(res.info);
+          }
+        }
+      });    
+    };
+   
+    //获取地址栏里（URL）传递的参数
+    function GetRequest() {
+      //url例子：XXX.aspx?ID=" + ID + "&Name=" + Name；
+      var url = location.search; //获取url中"?"符以及其后的字串
+      var theRequest = new Object();
+      if (url.indexOf("?") != -1) //url中存在问号，也就说有参数。
+      {
+        var str = url.substr(1);
+        strs = str.split("&");
+        for (var i = 0; i < strs.length; i++) {
+          theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+        }
+      }
+      return theRequest;
+    }
+
+    function getStr(arr, studentkey, starttime, token) {
+      var tostr = arr?getStrings(arr, ""):'';
+      return $.md5(hex_sha1($.md5(tostr) + $.md5(studentkey) + starttime) + token);
+    }
+
+    function getStrings(data, str) {
+      for (var x in data) {
+        if (isJson(data[x])) {
+          var i = 0;
+          for (var k in data[x]) {
+            i++;
+            break;
+          }
+          if (i > 0) {
+            str += x;
+            str = getStrings(data[x], str);
+          }
+        } else if (isArray(data[x])) {
+          if (data[x].length != 0) {
+            str += x;
+            str = getStrings(data[x], str);
+          }
+        } else {
+          if (
+            data[x] !== undefined &&
+            data[x] !== null &&
+            data[x] !== "" &&
+            data[x] !== false &&
+            data[x] !== true
+          ) {
+            str += x.toString() + data[x].toString();
+          }
+        }
+      }
+      return str;
+    }
+    function isArray(o) {
+      return Object.prototype.toString.call(o) == "[object Array]";
+    }
+    function isJson(obj) {
+      return (
+        typeof obj == "object" &&
+        Object.prototype.toString.call(obj).toLowerCase() == "[object object]" &&
+        !obj.length
+      );
+    }
+  </script>
+</body>
+
+</html>

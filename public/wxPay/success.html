@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <title>Document</title>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="total">
+        <div class="topImg"><img src="" alt="" class="innerImg"></div>
+        <div class="payTitle"></div>
+        <div class="payInfo"></div>
+        <div class="payBack"></div>
+      </div>
+    </div>
+    
+  </body>
+  <script src="./jquery.min.js"></script>
+  <script>
+    function GetQueryString(name){
+      var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+      var r = window.location.search.substr(1).match(reg);
+      if(r!=null)return  unescape(r[2]); return null;
+    }
+    var type = GetQueryString("type");
+    if(type==2){
+      $(".innerImg").attr("src", "./assets/images/success.png");  
+      $('.payTitle').append('充值成功')
+      $('.payInfo').append('恭喜您，充值成功')
+      $('.payBack').append('返回个人中心')
+    }else if(type==3){
+      $(".innerImg").attr("src", "./assets/images/fail.png");  
+      $('.payTitle').append('充值失败')
+      $('.payInfo').append('不好意思，您充值失败')
+      $('.payBack').append('重新充值')
+    }else{
+
+    }
+    $('.payBack').click(function(){
+      window.location.href = 'http://test.menke.com/student/#/UserCenter'
+    })
+  </script>
+  <style>
+    .outer{
+      width: 1300px;
+      height: 824px;
+      margin: 0 auto;
+      margin-top: 300px;
+    }
+    .total{
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+  .topImg{
+    width: 57px;
+    height: 57px;
+    margin: 0 auto;
+  }
+  .payTitle{
+    width: 80px;
+    height: 20px;
+    font-size: 20px;
+    color: #37383D;
+    margin: 0 auto;
+    margin-top: 16px;
+    margin-bottom: 13px;
+  }
+  .payInfo{
+    margin: 0 auto;
+    width: 191px;
+    height: 14px;
+    font-size: 14px;
+    color: #69696B;
+    margin-bottom: 42px;
+  }
+  .payBack{
+    margin: 0 auto;
+    width: 122px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    border: 1px solid #02CEB8;
+    background:rgba(255,255,255,1);
+    color: #02CEB8;
+    border-radius: 4px;
+  }
+  .payBack:hover{
+    cursor: pointer;
+  }
+  </style>
+</html>

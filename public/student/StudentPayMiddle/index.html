@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>pay</title>
+</head>
+
+<body>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/layer/layer.js"></script>
+  <script src="js/md5.js"></script>
+  <script src="js/base64.js"></script>
+  <script>
+    var type = GetRequest().type;
+    var studentid = GetRequest().studentid;
+    var amount = GetRequest().amount;
+    var paytype = GetRequest().paytype;
+    var source = GetRequest().source;
+    var type = GetRequest().type;
+    var host = '/';
+    window.localStorage.removeItem('codeurl');
+    sendPay();
+    function sendPay(){
+      var token = JSON.parse(window.localStorage.getItem("studentinfo")).token;
+      var starttime = Date.parse(new Date());
+      var SignStr = getStr(
+          {
+            studentid: studentid,
+            amount: amount,
+            paytype: paytype,
+            source: source
+          },
+          localStorage.getItem("studentkey"),
+          starttime,
+          token
+      )
+      $.ajax({
+        url:  host + 'student/User/studentRecharge',
+        type:'post',
+        headers:{
+          "token":token,
+          "starttime":starttime,
+          "sign":SignStr
+        },
+        data:{
+          studentid: studentid,
+          amount: amount,
+          paytype: paytype,
+          source: source
+        },
+        dataType:'json',
+        success:function(res){
+          if(res.code == 0){
+            if(paytype == 2){
+              window.localStorage.setItem('codeurl',res.data.codeurl);
+              // window.location.href =  'http://127.0.0.1:8020/origin-student/src/container/wxPay/wxPay.html?__hbt=1528809211725&ordernum='+res.data.rechargenum+'&price='+res.data.price+'&type=1';
+              window.location.href = window.location.origin + '/student/wxPay/wxPay.html?ordernum='+res.data.rechargenum+'&price='+res.data.price+'&type=1';
+            }else if(paytype == 3){
+              var div = document.createElement('div');
+              div.innerHTML = res.data.data;
+              document.body.appendChild(div)
+              document.forms.alipaysubmit.submit();
+            }else{
+
+            }
+          }else{
+            layer.msg(res.info);
+          }
+
+        }
+      })
+    };
+    //获取地址栏里（URL）传递的参数
+    function GetRequest() {
+      //url例子：XXX.aspx?ID=" + ID + "&Name=" + Name；
+      var url = location.search; //获取url中"?"符以及其后的字串
+      var theRequest = new Object();
+      if (url.indexOf("?") != -1) //url中存在问号，也就说有参数。
+      {
+        var str = url.substr(1);
+        strs = str.split("&");
+        for (var i = 0; i < strs.length; i++) {
+          theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+        }
+      }
+      return theRequest;
+    }
+
+    function getStr(arr, studentkey, starttime, token) {
+      var tostr = arr?getStrings(arr, ""):'';
+      // console.log(333,studentkey)
+      return $.md5(hex_sha1($.md5(tostr) + $.md5(studentkey) + starttime) + token);
+    }
+
+    function getStrings(data, str) {
+      for (var x in data) {
+        if (isJson(data[x])) {
+          var i = 0;
+          for (var k in data[x]) {
+            i++;
+            break;
+          }
+          if (i > 0) {
+            str += x;
+            str = getStrings(data[x], str);
+          }
+        } else if (isArray(data[x])) {
+          if (data[x].length != 0) {
+            str += x;
+            str = getStrings(data[x], str);
+          }
+        } else {
+          if (
+            data[x] !== undefined &&
+            data[x] !== null &&
+            data[x] !== "" &&
+            data[x] !== false &&
+            data[x] !== true
+          ) {
+            str += x.toString() + data[x].toString();
+          }
+        }
+      }
+      return str;
+    }
+    function isArray(o) {
+      return Object.prototype.toString.call(o) == "[object Array]";
+    }
+    function isJson(obj) {
+      return (
+        typeof obj == "object" &&
+        Object.prototype.toString.call(obj).toLowerCase() == "[object object]" &&
+        !obj.length
+      );
+    }
+  </script>
+</body>
+
+</html>

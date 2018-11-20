@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>申请VIP</title>
+  <style>
+    *{
+      margin:0;
+      padding: 0;
+      font-family: '微软雅黑';
+    }
+    ul,li{
+      list-style: none;
+      box-sizing: border-box;
+    }
+
+    .container{
+      width: 100%;
+    }
+    .header{
+      width: 100%;
+      height: 400px;
+      margin: 0 auto;
+      background: url('./images/vip_bg.png') no-repeat;
+      background-position: center;
+    }
+    .content{
+      width: 1440px;
+      overflow: hidden;
+      background:rgba(255,255,255,1);
+      border-radius:8px;
+      box-shadow:5px 0px 32px rgba(204,204,204,0.31);
+      margin: 0 auto;
+      margin-bottom: 100px;
+    }
+    .item-box{
+      overflow: hidden;
+      width: 800px;
+      margin: 0 auto;
+      padding-top: 60px;
+    }
+    .item-box li{
+      float: left;
+      width:185px;
+      height:194px;
+      text-align: center;
+      border-radius:4px;
+      border: 1px solid rgba(193,237,228,1);
+      margin:0 0 0 60px;
+    }
+    .item-box li h3{
+      font-size:16px;
+      color:rgba(51,51,51,1);
+    }
+    .item-box li p{
+      font-size:12px;
+      color:rgba(153,153,153,1);
+      padding: 10px;
+    }
+    .content-footer{
+      padding:50px 20px 50px;
+    }
+    .btn{
+      display: block;
+      width: 190px;
+      height: 45px;
+      border-radius: 30px;
+      text-align: center;
+      color: #fff;
+      background-color: #32c2a6;
+      line-height: 45px;
+      box-shadow: 0 5px 20px 5px rgba(50,194,166,0.4);
+      margin: 0 auto;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+
+    </div>
+    <div class="content">
+      <ul class="item-box">
+        <li class="item">
+          <img src="images/icon_1.png" alt="">
+          <h3>专属的门户网站</h3>
+          <p>独立域名、独立官网、多套模板任您选</p>
+        </li>
+        <li class="item">
+          <img src="images/icon_2.png" alt="">
+          <h3>丰富的课程管理方式</h3>
+          <p>自定义分类、课程标签、服务标识</p>
+        </li>
+        <li class="item">
+          <img src="images/icon_3.png" alt="">
+          <h3>独立的招生体系</h3>
+          <p>独立招生、可导入学生生源不流失</p>
+        </li>
+      </ul>
+      <ul class="item-box">
+        <li class="item">
+          <img src="images/icon_4.png" alt="">
+          <h3>丰富的营销方式</h3>
+          <p>优惠券、课程推荐、老师推荐让营销更方便</p>
+        </li>
+        <li class="item">
+          <img src="images/icon_5.png" alt="">
+          <h3>自由的权限管理</h3>
+          <p>多角色权限分配，细化教学管理</p>
+        </li>
+        <li class="item">
+          <img src="images/icon_6.png" alt="">
+          <h3>完善的技术保障</h3>
+          <p>7*24小时技术支持，维护系统安全</p>
+        </li>
+      </ul>
+      <div class="content-footer">
+        <a href="javascript:;" id="btn" class="btn">
+          立即申请
+        </a>
+      </div>
+    </div>
+  </div>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/layer/layer.js"></script>
+  <script type="text/javascript" src="js/base64.js" ></script>
+  <script type="text/javascript" src="js/md5.js" ></script>
+  <script type="text/javascript">
+  window.alert = function(msg,type){
+    layer.msg(msg, {icon: type});
+  }
+var host = "http://test.menke.com/";
+var btn = $('#btn');
+btn.click(function(){
+  getVip();
+});
+function getVip() {
+  var key = localStorage.getItem('key');
+  var starttime = Date.parse(new Date());
+  var token = JSON.parse(localStorage.getItem('userinfo')).token;
+  var sign = getStr({'organid': GetRequest().d },key,starttime,token);
+
+
+  $.ajax({
+    url: host + "admin/Index/applyVipOrgan",
+    data: {
+      'organid': GetRequest().d,
+    },
+    headers:{
+      starttime:starttime,
+      sign:sign,
+      token:token
+    },
+    dataType:'json',
+    type: "post",
+    success: function(res) {
+      if (res.code === 0) {
+        alert(res.info,1)
+      }else{
+        alert(res.info,2)
+      }
+    }
+  });
+}
+function getStr(arr,key,starttime,token) {
+   var tostr = getStrings(arr,'');
+   // console.log(tostr);
+   console.log(key);
+   console.log(starttime);
+   console.log(token);
+   return $.md5(hex_sha1($.md5(tostr)+$.md5(key)+starttime)+token);
+}
+
+
+function getStrings(data,str){
+   for (x in data) {
+       if(isJson(data[x])||isArray(data[x])){
+           str += x;
+           str = getStrings(data[x],str);
+       }else{
+           str += x+data[x];
+       }
+   }
+   return str;
+}
+function isArray(o){
+   return Object.prototype.toString.call(o)=='[object Array]';
+}
+function isJson(obj){
+   return typeof(obj) == "object" && Object.prototype.toString.call(obj).toLowerCase() == "[object object]" && !obj.length;
+}
+function GetRequest() {
+  //url例子：XXX.aspx?ID=" + ID + "&Name=" + Name；
+  var url = location.search; //获取url中"?"符以及其后的字串
+  var theRequest = new Object();
+  if (url.indexOf("?") != -1) {
+    //url中存在问号，也就说有参数。
+    var str = url.substr(1);
+    strs = str.split("&");
+    for (var i = 0; i < strs.length; i++) {
+      theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+    }
+  }
+  return theRequest;
+}
+</script>
+</body>
+</html>

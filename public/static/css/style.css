@@ -1,0 +1,41 @@
+html,body{height: 100%;}
+body{font-family:'Microsoft YaHei', '微软雅黑'; font-size:14px; color:#000;}
+input{font-family:'Microsoft YaHei', '微软雅黑'; font-size:14px; color:#000} #main
+                                                                         div{ margin:10px 0px}
+select{width: 180px}
+input{ text-align:left} #main div.box{overflow: hidden; }
+.btn-info{background-color: #2d8cf0de;border-color: #2d8cf0;color: #fff;}
+.btn-info:hover,
+.btn-info:focus,
+.btn-info:active,
+.btn-info.active,
+.open .dropdown-toggle.btn-info.btn-info:visited{background-color: #2d8cf0de;border-color: #2d8cf0;color: #fff;}
+.form-control{font-size: 14px;width: 100%;}
+
+.innavbar{background:-webkit-linear-gradient(left,#42acff,#19d4cb);line-height: 40px;position: relative;margin-bottom: 0px;}
+.innavbar .title{ font-size: 20px; color: #fff;margin-left: 20px;}
+
+.incontent{width: 100%; overflow:hidden;margin-top: 0px;height: 100%;margin-bottom: -52px;border-top: 1px solid #ccc; }
+.incontent .inleft{width: 20%;height: 100%;float: left;overflow-y: scroll;padding-bottom: 54px;}
+.incontent .inleft::-webkit-scrollbar {width: 2px;height:1px;}
+.incontent .inleft::-webkit-scrollbar-thumb {border-radius: 10px; -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);background: #2d8cf0;}
+.incontent .inleft::-webkit-scrollbar-track {-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);border-radius: 10px;background: #EDEDED;}
+
+textarea::-webkit-scrollbar {width: 2px;height:1px;}
+textarea::-webkit-scrollbar-thumb {border-radius: 10px; -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);background: #2d8cf0;}
+textarea::-webkit-scrollbar-track {-webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);border-radius: 10px;background: #EDEDED;}
+
+.incontent .inleft li{list-style-type: none;height: 30px;line-height: 30px;transition: background-color .5s ease-in .1s,border-color .1s ease-in .5s;background-color: #fff;color:#000;padding: 0px 10px;cursor: pointer;word-break:keep-all;/* 不换行 */
+    white-space:nowrap;overflow:hidden;/* 内容超出宽度时隐藏超出部分的内容 */
+    text-overflow:ellipsis;}
+.incontent .inleft li:hover{background-color: #42acff;}
+.incontent .inleft li.active{background-color: #42acff;color: #fff;}
+
+
+.incontent .inright{width: 80%; height: 100%;float: left; padding:10px 10px 0px 10px;overflow: hidden;}
+.incontent .inright .contents .zuoce{padding-left: 0px;}
+.contents .col-lg-3,.contents .col-lg-4,.contents .col-lg-5{padding-right: 0px;}
+.incontent .inright .contents .zuoce div{margin-bottom:8px;}
+.incontent .inright .rightIn{position: absolute;right: 0px;margin-right: 6px;color: #2d8cf0de}
+.incontent .inright .positionIn{position: absolute;color: #2d8cf0de;display: block;background: #F9FBFB;padding: 0px 10px;right: 1px;margin-top: 1px;}
+.incontent .inright .intext{height: 36px;line-height: 36px;}

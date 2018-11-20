@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div class="wrapper" style="width: 1075px;margin: 0 auto">
+        <div class="wxhead">
+            <div class="container">
+                <div class="flex-box">
+                    <img src="./assets/images/wxpay.png" alt="">
+                    <div class="segmentation"></div>
+                    <h2>我的收银台</h2>
+                </div>
+            </div>
+        </div>
+      </div>
+        <div class="wxinfo">
+            <div class="container" style="width: 1075px;margin: 0 auto;">
+                <ul>
+                    <li class="serialnumber">订单编号：<span id="orderNum"></span></li>
+                    <li class="serialtype">订单类型：学生充值</li>
+                </ul>
+                <div class="paymoney">
+                    应付金额：<span>￥<span id="totalPrice"></span></span>
+                </div>
+            </div>
+        </div>
+        <div class="wrapper" style="width: 1075px;margin: 0 auto">
+        <div class="paytitle">
+            <div class="container">
+                <div class="paycontent">
+                    <ul class="totalinfo">
+                        <li class="wxpay">微信支付</li>
+                        <li class="remPic"><img src="./assets/images/recommend.png" /></li>
+                        <li class="info">亿万用户的选择，更快更安全</li>
+                    </ul>
+    
+                    <ul class="payimg">
+                        <li class="qrcode"><img src="" alt="" id="codeImg"></li>
+                        <li class="scanning"><img src="./assets/images/pay.png" alt=""></li>
+                    </ul>
+    
+                </div>
+            </div>
+        </div>
+      </div>
+    
+</body>
+<script src="./jquery.min.js"></script>
+<script>
+  function GetQueryString(name){
+     var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+     var r = window.location.search.substr(1).match(reg);
+     if(r!=null)return  unescape(r[2]); return null;
+  }
+  var ordernum = GetQueryString("ordernum");
+  var price = GetQueryString("price");
+  var codeurl = GetQueryString("codeurl");
+  document.getElementById('orderNum').innerHTML = ordernum;
+  document.getElementById('totalPrice').innerHTML = price;
+  document.getElementById('codeImg').src = codeurl;
+  function checkStatus () {
+    $.ajax({
+      url:'http://test.menke.com/student/Myorder/orderQuery.html',
+      type:'POST', 
+      async:true, 
+      data:{
+        ordernum:ordernum
+      },
+      dataType:'json', 
+      beforeSend:function(xhr){
+      },
+      success:function(data){
+        //   console.log(3,data)
+        if ( data.code===0 ) { 
+          if(data.data.trade_state == 'SUCCESS'){
+            clearInterval(window.a);
+            window.location.href = 'http://127.0.0.1:8020/origin-student/src/container/paySuccess/success.html?__hbt=1528254757161&type=2'
+            return false;
+          }else if (data.data.trade_state == 'PAYERROR'){
+              clearInterval(window.a);
+              window.location.href = 'http://127.0.0.1:8020/origin-student/src/container/paySuccess/success.html?__hbt=1528254757161&type=3'
+              return false;
+          }else{
+
+          }
+        } else { 
+          
+        } 
+      },
+      error:function(xhr,textStatus){
+      },
+      complete:function(){   
+      }
+    })
+  }
+  window.a = setInterval(function(){ 
+    checkStatus();
+  },3000)
+</script>
+<style>
+ul{
+    margin: 0;
+}
+li{
+    list-style: none;
+}
+.wxhead{
+    width: 100%;
+    background: #fff;
+    height: 62px;
+    position: relative;
+    margin-bottom: 20px;
+}
+.wxhead h2{
+    font-size:16px;
+    color:rgba(103,109,112,1);
+    margin-top: 20px;
+    position: absolute;
+    top: 10px;
+    left: 200px;
+}
+.wxhead img{
+    margin: 9px 0;
+}
+.wxhead .segmentation{
+    width:1px;
+    height:20px;
+    background:#676D70;
+    margin: 20px 10px;
+    position: absolute;
+    top: 11px;
+    left: 180px;
+}
+.wxinfo{
+    width:100%;
+    height: 128px;
+    background: #eee;
+}
+.wxinfo ul{
+    float: left;
+    
+}
+.wxinfo li{
+    font-size: 14px;
+    color: rgba(103,109,112,1);
+}
+.wxinfo li.serialnumber{
+    margin-top: 40px;
+}
+.wxinfo li.serialtype{
+    margin-top: 20px;
+}
+.wxinfo .paymoney{
+    float: right;
+    color: #676D70;
+    font-size: 14px;
+    margin-top: 51px;
+    margin-right: 70px;
+    
+}
+.paymoney span{
+    color: #ff8208;
+    font-size: 16px;
+}
+.paytitle{
+    width: 1075px;
+    min-width: 1075#676d70;
+    height: 480px;
+    margin-top: 30px;
+}
+.paytitle .paycontent{
+    width: 100%;
+    height: 40px;
+    line-height: 42px;
+}
+.paycontent ul.flex-box{
+    border: 1px solid #999999;
+    border-bottom: none;
+}
+.flex-box li.wxpay{
+    font-size: 14px;
+    font-family:PingFangSC-Medium;
+    color:rgba(51,51,51,1);
+    margin: 0 6px 0 26px;
+}
+.totalinfo{
+    position: relative;
+    border: 1px solid #999999;
+    border-bottom: none;
+}
+
+.remPic{
+    position: absolute;
+    top: 5px;
+    left: 117px;
+}
+.remPic img{
+    width: 46px;
+    height: 20px;
+}
+.flex-box img{
+    width: 158px;
+    height: 52px;
+    margin-top: 12px;
+}
+    li.info{
+    font-size: 12px;
+    color: rgba(153,153,153,1);
+    position: absolute;
+    top: 0;
+    left: 180px;
+}
+.paycontent ul.payimg{
+    border: 1px solid #999999;
+    
+}
+.payimg img{
+    display: block;
+}
+
+.qrcode img{
+        width: 160px;
+        height: 160px;
+        margin: 95px auto 28px auto;
+    }
+.payimg li.scanning{
+    cursor: pointer;
+    
+}
+.scanning img{
+    width: 156px;
+    height: 52px;
+    margin: 0 auto 105px auto;
+}
+</style>
+</html>

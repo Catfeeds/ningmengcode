@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+Server: nginx/1.4.6 (Ubuntu)
+Date: Wed, 22 Aug 2018 09:58:23 GMT
+Content-Type: text/html; charset=UTF-8
+Transfer-Encoding: chunked
+Connection: close
+Vary: Accept-Encoding
+X-Powered-By: PHP/5.6.31
+Set-Cookie: PHPSESSID=k3f9u33o2t37cbntbgue4mpc20; path=/
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate, post-check=0, pre-check=0
+Pragma: no-cache
+
+20
+{"result":3003,"nickname":"123"}
+0
+

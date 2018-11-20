@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="ie=edge">
+      <title data-locale="recharge">充值</title>
+  </head>
+  <body>
+    <div class="outer">
+      <div class="total">
+        <div class="topImg"><img src="" alt="" class="innerImg"></div>
+        <div class="payTitle"></div>
+        <div class="payInfo"></div>
+        <div class="payBack"></div>
+      </div>
+    </div>
+    
+  </body>
+  <script src="./jquery.min.js"></script>
+  <!-- 加载语言包文件 -->
+  <script src="./jquery.i18n.properties-min-1.0.9.js"></script>
+  <!-- <script src="./language.js"></script> -->
+  <script>
+    loadProperties();  
+    function loadProperties() {  
+      $.i18n.properties({  
+        name:'strings',    //属性文件名     命名格式： 文件名_国家代号.properties
+        path:'i18n/',   //注意这里路径是你属性文件的所在文件夹
+        mode:'map',  
+        language:"zh",     //这就是国家代号 name+language刚好组成属性文件名：strings+zh -> strings_zh.properties
+        callback:function(){  
+          $("[data-locale]").each(function(){  
+            console.log($(this).data("locale"));
+              $(this).html($.i18n.prop($(this).data("locale"))); 
+          });  
+        }  
+      });  
+    }
+    function GetQueryString(name){
+      var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+      var r = window.location.search.substr(1).match(reg);
+      if(r!=null)return  unescape(r[2]); return null;
+    }
+    var type = GetQueryString("type");
+    if(type==2){
+      $(".innerImg").attr("src", "./assets/images/success.png");  
+      $('.payTitle').append(jQuery.i18n.prop('payYes'))
+      $('.payInfo').append(jQuery.i18n.prop('payYesInfo'))
+      $('.payBack').append(jQuery.i18n.prop('goBack'))
+    }else if(type==3){
+      $(".innerImg").attr("src", "./assets/images/fail.png");  
+      $('.payTitle').append(jQuery.i18n.prop('payNo'))
+      $('.payInfo').append(jQuery.i18n.prop('payNoInfo'))
+      $('.payBack').append(jQuery.i18n.prop('payAgain'))
+    }else{
+
+    }
+    $('.payBack').click(function(){
+      window.location.href = window.location.origin + '/student/#/UserCenter';
+    })
+  </script>
+  <style>
+    .outer{
+      width: 1300px;
+      height: 824px;
+      margin: 0 auto;
+      margin-top: 300px;
+    }
+    .total{
+      width: 200px;
+      height: 200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+  .topImg{
+    width: 57px;
+    height: 57px;
+    margin: 0 auto;
+  }
+  .payTitle{
+    width: 80px;
+    height: 20px;
+    font-size: 20px;
+    color: #37383D;
+    margin: 0 auto;
+    margin-top: 16px;
+    margin-bottom: 13px;
+  }
+  .payInfo{
+    margin: 0 auto;
+    width: 191px;
+    height: 14px;
+    font-size: 14px;
+    color: #69696B;
+    margin-bottom: 42px;
+  }
+  .payBack{
+    margin: 0 auto;
+    width: 122px;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    border: 1px solid #02CEB8;
+    background:rgba(255,255,255,1);
+    color: #02CEB8;
+    border-radius: 4px;
+  }
+  .payBack:hover{
+    cursor: pointer;
+  }
+  </style>
+</html>
